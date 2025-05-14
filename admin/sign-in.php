@@ -2,8 +2,6 @@
     include '_components/loading.php';
 ?>
 
-
-
 <?php
 	session_start();
     
@@ -40,7 +38,7 @@
                 <div class="w-[50%] justify-center flex min-[841px]items-center max-[840px]:bg-white max-[840px]:items-end ml-right z-1 !py-[75px] !pr-[100px] max-[1140px]:!pr-[50px] max-[840px]:!pr-[30px] max-[840px]:!pl-[30px] max-[840px]:!w-full">
                     <div class="flex flex-col justify-center gap-6 z-1 w-full">
                         <div class="flex flex-col gap-[30px]">
-                            <img src="../assets/images/placeholder-logo.png" alt="Labzada Logo" class="w-[75px] h-[75px]">
+                            <img src="<?= $base_url ?>/assets/images/Archive-Logo.png" alt="Labzada Logo" class="w-[75px] h-[75px]">
                             <div class="flex flex-col gap-3">
                                 <h1 class="text-3xl font-600 text-dark text-left mt-5">Admin Login</h1>
                                 <p class="text-zinc-600 mt-2">Please enter your credentials below.</p>
@@ -58,7 +56,7 @@
                                     <button type="submit" class="bg-primary rounded-[7px] !px-10 !py-4 text-center text-light font-500 w-full">Sign In</button>
                                 </div>
                             </form>
-                            <p class="text-center neural-grotesk">Don't have an account yet? <a href="sign-up" class="text-accent font-500">Sign Up</a></p>
+                            <p class="text-center neural-grotesk">Don't have an account yet? <a href="<?= $base_url ?>/admin/sign-up" class="text-accent font-500">Sign Up</a></p>
                         </div>
                     </div>
                 </div>

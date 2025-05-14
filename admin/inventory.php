@@ -61,10 +61,10 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="p-6">
                         <div class="relative pt-5">
                             <img 
-                                src="../upload/<?= htmlspecialchars($lab_equipment['temp_name']); ?>"
+                                src="<?= $base_url ?>/upload/<?= htmlspecialchars($lab_equipment['temp_name']); ?>"
                                 alt="<?= htmlspecialchars($lab_equipment['item_name']); ?>"
                                 class="w-full h-70 object-cover rounded-lg mb-4 "
-                                onerror="this.onerror=null; this.src='/assets/images/placeholder-broken-image.jpg';"
+                                onerror="this.onerror=null; this.src='<?= $base_url ?>/assets/images/placeholder-broken-image.jpg';"
                             >
                             <div class="absolute top-0 right-0">
                                 <span class="<?= ($lab_equipment['total_available'] > 0) ? 'flex justify-center bg-[#D0E9DB] text-[#16904D] py-2 px-5 rounded-[5px] neural-grotesk text-[13px]' : 'flex justify-center bg-[#F0D2D2] text-[#B61E1E] py-2 px-5 rounded-[5px] neural-grotesk text-[13px]'; ?>">
