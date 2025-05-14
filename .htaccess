@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Set base path dynamically - will be empty on live server with domain root
+# and /rshs-archive/ on localhost
+RewriteCond %{HTTP_HOST} localhost
+RewriteRule .* - [E=BASE_PATH:/rshs-archive]
+
+# Remove .php extension from URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Rewrite URLs for /admin/ and /student/ paths
+# RewriteRule ^admin/(.*)$ %{ENV:BASE_PATH}/admin/$1 [L]
+# RewriteRule ^student/(.*)$ %{ENV:BASE_PATH}/students/$1 [L]
