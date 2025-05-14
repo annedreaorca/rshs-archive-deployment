@@ -7,6 +7,18 @@ if (isset($_POST['submit'])) {
     $uploader = $_POST['uploader'];
     $item_status = $_POST['item_status'];
     $total_available = $_POST['total_available'];
+    
+    // Handle classification selection
+    if (isset($_POST['classification']) && $_POST['classification'] == 'other' && !empty($_POST['custom_classification'])) {
+        // Use custom classification if "Other" was selected
+        $classification = $_POST['custom_classification'];
+    } elseif (isset($_POST['classification']) && $_POST['classification'] != '') {
+        // Use selected classification
+        $classification = $_POST['classification'];
+    } else {
+        // No classification provided
+        $classification = null;
+    }
 
     // Check if the item already exists
     $checkItem = $conn->prepare("SELECT COUNT(*) FROM lab_equipments WHERE item_name = ?");
@@ -49,9 +61,9 @@ if (isset($_POST['submit'])) {
         if (move_uploaded_file($temp, "../upload/" . $fname)) {
             try {
                 $query = $conn->prepare("INSERT INTO lab_equipments
-                    (item_name, item_description, uploader, item_status, total_available, file_name, temp_name, is_archived)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                $query->execute([$item_name, $item_description, $uploader, $item_status, $total_available, $name, $fname, 0]);
+                    (item_name, item_description, uploader, item_status, total_available, file_name, temp_name, is_archived, classification)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $query->execute([$item_name, $item_description, $uploader, $item_status, $total_available, $name, $fname, 0, $classification]);
 
                 header("Location: add-item.php?success=Item has been uploaded!");
                 exit();
@@ -68,9 +80,9 @@ if (isset($_POST['submit'])) {
     } else {
         try {
             $query = $conn->prepare("INSERT INTO lab_equipments
-                (item_name, item_description, uploader, item_status, total_available, is_archived)
-                VALUES (?, ?, ?, ?, ?, ?)");
-            $query->execute([$item_name, $item_description, $uploader, $item_status, $total_available, 0]);
+                (item_name, item_description, uploader, item_status, total_available, is_archived, classification)
+                VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $query->execute([$item_name, $item_description, $uploader, $item_status, $total_available, 0, $classification]);
 
             header('location: add-item.php?success=Item has been uploaded!');
         } catch (PDOException $e) {
@@ -89,11 +101,23 @@ if (isset($_POST['update'])) {
     $uploader = $_POST['uploader'];
     $item_status = $_POST['item_status'];
     $total_available = $_POST['total_available'];
+    
+    // Handle category update
+    if (isset($_POST['category']) && $_POST['category'] == 'other' && !empty($_POST['category'])) {
+        // Use custom category if "Other" was selected
+        $category = $_POST['custom_category'];
+    } elseif (isset($_POST['category']) && $_POST['category'] != '') {
+        // Use selected category
+        $category = $_POST['category'];
+    } else {
+        // No category provided
+        $category = null;
+    }
 
     $query = $conn->prepare("UPDATE lab_equipments 
-                             SET item_description=?, uploader=?, item_status=?, total_available=? 
+                             SET item_description=?, uploader=?, item_status=?, total_available=?, category=? 
                              WHERE item_name=?");
-    $query->execute([$item_description, $uploader, $item_status, $total_available, $item_name]);
+    $query->execute([$item_description, $uploader, $item_status, $total_available, $category, $item_name]);
 
     header("Location: inventory.php?success=Item updated!");
     exit();

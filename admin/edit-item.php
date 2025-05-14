@@ -1,88 +1,132 @@
 <?php
-    $pageTitle = 'Edit Laboratory Equipment';
-    include 'admin-layout-header.php';
-    include '_components/loading.php';
-    include '../db-conn.php';
+$pageTitle = 'Edit Laboratory Equipment';
+include 'admin-layout-header.php';
+include '_components/loading.php';
+include '../db-conn.php';
 
-    if (isset($_GET['item_name'])) {
-        $item_name = $_GET['item_name'];
-        $query = $conn->prepare("SELECT * FROM lab_equipments WHERE item_name = ?");
-        $query->execute([$item_name]);
-        $item = $query->fetch(PDO::FETCH_ASSOC);
-
-        if (!$item) {
-            header("Location: inventory.php?error=Item not found!");
-            exit();
-        }
-    } else {
-        header("Location: inventory.php?error=No item selected!");
+// Check if item_name is provided
+if (isset($_GET['item_name'])) {
+    $item_name = $_GET['item_name'];
+    
+    // Fetch item details
+    $stmt = $conn->prepare("SELECT * FROM lab_equipments WHERE item_name = ?");
+    $stmt->execute([$item_name]);
+    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$item) {
+        header("Location: inventory.php?error=Item not found");
         exit();
     }
+    
+    // Fetch all unique categories for dropdown
+    $sqlCategories = "SELECT DISTINCT category FROM lab_equipments WHERE category IS NOT NULL AND category != '' ORDER BY category";
+    $stmtClass = $conn->prepare($sqlCategories);
+    $stmtClass->execute();
+    $categories = $stmtClass->fetchAll(PDO::FETCH_ASSOC);
+
+    // Predefined categories if database doesn't have any yet
+    $predefinedCategories = [
+        'Mechanics',
+        'Electricity & Electronics',
+        'Magnetism & Electromagnetism',
+        'Waves & Sound',
+        'Optics & Light',
+        'Thermodynamics',
+        'Fluid Mechanics',
+        'General Chemistry',
+        'Electrochemistry',
+        'Specialized Chemistry',
+        'Biology & Life Sciences',
+        'Environmental Science',
+        'Engineering & Demonstration Models',
+        'Educational Materials',
+        'General Lab Supplies'
+    ];
+    
+    // Merge existing and predefined categories (removing duplicates)
+    $allCategories = [];
+    foreach ($categories as $category) {
+        $allCategories[] = $category['category'];
+    }
+    
+    $finalCategories = array_unique(array_merge($allCategories, $predefinedCategories));
+    sort($finalCategories); // Sort alphabetically
+} else {
+    header("Location: inventory.php?error=No item specified");
+    exit();
+}
 ?>
 
 <section class="flex">
     <?php include '_components/sidebar.php'; ?>
     <main class="flex-1 min-h-screen p-8 ml-[272px] max-[1023px]:ml-[0px] overflow-scroll-y">
         <div class="page-heading">
-            <h1>Edit Item</h1>
-            <p class="text-gray-600">Update details to your laboratory equipments.</p>
+            <h1>Edit Laboratory Equipment</h1>
+            <p class="text-gray-600">Update information for "<?= htmlspecialchars($item_name) ?>"</p>
         </div>
+        <?php if (isset($_GET['prompt']) && $_GET['prompt'] == 'edit'): ?>
+            <div class="bg-yellow-100 text-yellow-800 p-4 my-4 rounded-md">
+                This item already exists. You can edit its information below.
+            </div>
+        <?php endif; ?>
         <div class="flex flex-col mt-10 bg-white shadow-lg rounded-lg p-6">
-            <form class="space-y-6" action="edit-item-function.php?item_name=<?= urlencode($item['item_name']) ?>" method="post" enctype="multipart/form-data">
-                <!-- Success Alert -->
-                <?php if (isset($_GET['success'])) { ?>
-                <div class="bg-green-100 text-green-800 p-4 rounded-md flex items-center justify-between">
-                    <span><?= htmlspecialchars($_GET['success']) ?></span>
-                    <button type="button" class="text-green-800" data-bs-dismiss="alert" aria-label="Close">&times;</button>
-                </div>
-                <?php } ?>
-
-                <!-- Item Name -->
+            <form class="space-y-6" action="add-item-function.php" method="post" enctype="multipart/form-data">
+                <!-- Item Name (readonly) -->
                 <div>
                     <label for="item_name" class="block text-sm font-medium text-gray-700">Item Name</label>
-                    <input type="text" name="item_name" id="item_name" value="<?= htmlspecialchars($item['item_name']) ?>" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    <input type="text" name="item_name" id="item_name" value="<?= htmlspecialchars($item['item_name']) ?>" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100" readonly>
                 </div>
 
                 <!-- Item Description -->
                 <div>
                     <label for="item_description" class="block text-sm font-medium text-gray-700">Item Description</label>
-                    <input type="text" name="item_description" id="item_description" value="<?= htmlspecialchars($item['item_description']) ?>" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    <input type="text" name="item_description" id="item_description" value="<?= htmlspecialchars($item['item_description']) ?>" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                </div>
+
+                <!-- Category Dropdown -->
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                    <select name="category" id="category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                        <option value="">-- Select Category --</option>
+                        <?php foreach ($finalCategories as $category): ?>
+                            <option value="<?= htmlspecialchars($category) ?>" <?= ($item['category'] == $category) ? 'selected' : '' ?>><?= htmlspecialchars($category) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Custom Category Input (shows when "Other" is selected) -->
+                <div id="customCategoryContainer" style="display: none;">
+                    <label for="custom_category" class="block text-sm font-medium text-gray-700">Custom Category</label>
+                    <input type="text" name="custom_category" id="custom_category" placeholder="Enter custom category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                </div>
+
+                <!-- Item Status -->
+                <div>
+                    <label for="item_status" class="block text-sm font-medium text-gray-700">Status</label>
+                    <select name="item_status" id="item_status" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                        <option value="Available" <?= ($item['item_status'] == 'Available') ? 'selected' : '' ?>>Available</option>
+                        <option value="Not Available" <?= ($item['item_status'] == 'Not Available') ? 'selected' : '' ?>>Not Available</option>
+                    </select>
                 </div>
 
                 <!-- Availability -->
                 <div>
                     <label for="total_available" class="block text-sm font-medium text-gray-700">Number of Items</label>
-                    <input type="text" name="total_available" id="total_available" value="<?= htmlspecialchars($item['total_available']) ?>" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    <input type="number" name="total_available" id="total_available" value="<?= htmlspecialchars($item['total_available']) ?>" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
                 </div>
 
-                <!-- File Upload -->
+                <!-- Current Image Preview -->
+                <?php if (!empty($item['temp_name'])): ?>
                 <div>
-                    <label for="file" class="block text-sm font-medium text-gray-700">Upload New Image</label>
-                    <div class="mt-1 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6">
-                        <div class="flex flex-col items-center space-y-1 text-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-photo-up">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M15 8h.01" />
-                                <path d="M12.5 21h-6.5a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v6.5" />
-                                <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l3.5 3.5" />
-                                <path d="M14 14l1 -1c.679 -.653 1.473 -.829 2.214 -.526" />
-                                <path d="M19 22v-6" />
-                                <path d="M22 19l-3 -3l-3 3" />
-                            </svg>
-                            <input type="file" name="file" id="file" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                            <p class="text-sm text-gray-600 mt-2">Drop files to upload or select a file</p>
-                        </div>
-                    </div>
+                    <label class="block text-sm font-medium text-gray-700">Current Image</label>
+                    <img src="../upload/<?= htmlspecialchars($item['temp_name']) ?>" alt="<?= htmlspecialchars($item['item_name']) ?>" class="mt-2 w-60 h-auto object-cover rounded-lg shadow-md" onerror="this.onerror=null; this.src='../assets/images/placeholder-broken-image.jpg';">
                 </div>
-
-                <!-- Hidden Inputs -->
-                <input type="hidden" name="old_image" value="<?= htmlspecialchars($item['file_name']) ?>">
+                <?php endif; ?>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end">
-                    <button type="submit" name="update" class="button-primary">
-                        Update
-                    </button>
+                <div class="flex justify-end gap-3">
+                    <a href="inventory.php" class="px-4 py-2 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300">Cancel</a>
+                    <button type="submit" name="update" class="button-primary">Update Item</button>
                 </div>
             </form>
         </div>
@@ -90,3 +134,33 @@
 </section>
 
 <?php include 'admin-layout-footer.php'; ?>
+
+<script>
+window.addEventListener('DOMContentLoaded', (event) => {
+    const categorySelect = document.getElementById('category');
+    const customcategoryContainer = document.getElementById('customCategoryContainer');
+    
+    // Add "Other" option at the end of the dropdown
+    const otherOption = document.createElement('option');
+    otherOption.value = "other";
+    otherOption.textContent = "Other (Custom)";
+    categorySelect.appendChild(otherOption);
+    
+    // Check if the current category is not in the list, select "Other"
+    const currentCategory = "<?= addslashes($item['category'] ?? '') ?>";
+    if (currentCategory && !Array.from(categorySelect.options).some(option => option.value === currentCategory)) {
+        categorySelect.value = "other";
+        document.getElementById('custom_category').value = currentCategory;
+        customCategoryContainer.style.display = 'block';
+    }
+    
+    // Show/hide custom category input based on selection
+    categorySelect.addEventListener('change', function() {
+        if (this.value === 'other') {
+            customCategoryContainer.style.display = 'block';
+        } else {
+            customCategoryContainer.style.display = 'none';
+        }
+    });
+});
+</script>

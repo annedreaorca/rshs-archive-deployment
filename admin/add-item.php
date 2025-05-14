@@ -2,9 +2,45 @@
     $pageTitle = 'Add Laboratory Equipment';
     include 'admin-layout-header.php';
     include '_components/loading.php';
+    include '../db-conn.php';
 
     // Assuming user_name is stored in session after login
     $uploaderName = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
+    
+    // Fetch all unique classifications for dropdown
+    $sqlCategories = "SELECT DISTINCT category FROM lab_equipments WHERE category IS NOT NULL AND category != '' ORDER BY category";
+    $stmtClass = $conn->prepare($sqlCategories);
+    $stmtClass->execute();
+    $categories = $stmtClass->fetchAll(PDO::FETCH_ASSOC);
+
+    // Predefined classifications if database doesn't have any yet
+    $predefinedCategories = [
+        'Mechanics',
+        'Electricity & Electronics',
+        'Magnetism & Electromagnetism',
+        'Waves & Sound',
+        'Optics & Light',
+        'Thermodynamics',
+        'Fluid Mechanics',
+        'General Chemistry',
+        'Electrochemistry',
+        'Specialized Chemistry',
+        'Biology & Life Sciences',
+        'Environmental Science',
+        'Engineering & Demonstration Models',
+        'Educational Materials',
+        'General Lab Supplies'
+    ];
+    
+    // Merge existing and predefined classifications (removing duplicates)
+    $allCategories = [];
+    foreach ($categories as $category) {
+        $allCategories[] = $category['category'];
+    }
+    
+
+    $finalCategories = array_unique(array_merge($allCategories, $predefinedCategories));
+    sort($finalCategories); // Sort alphabetically
 ?>
 
 <section class="flex">
@@ -24,6 +60,14 @@
                 </div>
                 <?php } ?>
 
+                <!-- Error Alert -->
+                <?php if (isset($_GET['error'])) { ?>
+                <div class="bg-red-100 text-red-800 p-4 rounded-md flex items-center justify-between">
+                    <span><?= htmlspecialchars($_GET['error']) ?></span>
+                    <button type="button" class="text-red-800" data-bs-dismiss="alert" aria-label="Close">&times;</button>
+                </div>
+                <?php } ?>
+
                 <!-- Item Name -->
                 <div>
                     <label for="item_name" class="block text-sm font-medium text-gray-700">Item Name</label>
@@ -33,14 +77,28 @@
                 <!-- Item Description -->
                 <div>
                     <label for="item_description" class="block text-sm font-medium text-gray-700">Item Description</label>
-                    <input type="text" name="item_description" id="item_description" placeholder="Enter item name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                    <input type="text" name="item_description" id="item_description" placeholder="Enter item description" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
                 </div>
 
-                <!-- Uploader -->
+                <!-- Classification Dropdown -->
                 <div>
-                    <label for="uploader" class="block text-sm font-medium text-gray-700">Uploader</label>
-                    <input type="text" name="uploader" id="uploader" value="<?= htmlspecialchars($uploaderName) ?>" placeholder="Enter uploader name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" readonly>
+                    <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                    <select name="category" id="category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                        <option value="">-- Select Categories --</option>
+                        <?php foreach ($finalCategories as $category): ?>
+                            <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
+
+                <!-- Custom Classification Input (shows when "Other" is selected) -->
+                <div id="customCategoryContainer" style="display: none;">
+                    <label for="custom_category" class="block text-sm font-medium text-gray-700">Custom Category</label>
+                    <input type="text" name="custom_category" id="custom_category" placeholder="Enter custom category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                </div>
+
+                <!-- Hidden Uploader Field -->
+                <input type="hidden" name="uploader" value="<?= htmlspecialchars($uploaderName) ?>">
 
                 <!-- Availability -->
                 <div>
@@ -83,3 +141,26 @@
 </section>
 
 <?php include 'admin-layout-footer.php'; ?>
+
+<script>
+// Add "Other" option to the dropdown
+window.addEventListener('DOMContentLoaded', (event) => {
+    const categorySelect = document.getElementById('category');
+    const customCategoryContainer = document.getElementById('customCategoryContainer');
+    
+    // Add "Other" option at the end of the dropdown
+    const otherOption = document.createElement('option');
+    otherOption.value = "other";
+    otherOption.textContent = "Other (Custom)";
+    categorySelect.appendChild(otherOption);
+    
+    // Show/hide custom category input based on selection
+    categorySelect.addEventListener('change', function() {
+        if (this.value === 'other') {
+            customCategoryContainer.style.display = 'block';
+        } else {
+            customCategoryContainer.style.display = 'none';
+        }
+    });
+});
+</script>
