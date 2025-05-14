@@ -45,7 +45,7 @@ if (isset($_POST['uid']) && isset($_POST['password'])) {
                     header("Location: " . $base_url . "/admin/dashboard");
                     exit();
                 } else {
-                    header("Location: " . $base_url . "/student/dashboard");
+                    header("Location: " . $base_url . "/students/dashboard");
                     exit();
                 }
             } else {

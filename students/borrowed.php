@@ -4,8 +4,6 @@ include 'students-layout-header.php';
 include '_components/loading.php';
 include '../db-conn.php';
 
-session_start();
-
 if (!isset($_SESSION['user_lrn_or_email'])) {
     die("Error: User not logged in.");
 }

@@ -3,18 +3,23 @@
 ?>
 
 <?php
-session_start();
+    session_start();
 
-// Prevent browser from caching the page
-header("Cache-Control: no-cache, no-store, must-revalidate");
-header("Pragma: no-cache");
-header("Expires: 0");
+    // Set base URL for redirections
+    $base_url = "";
+    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+        $base_url = "/rshs-archive";
+    }
+    // Prevent browser from caching the page
+    header("Cache-Control: no-cache, no-store, must-revalidate");
+    header("Pragma: no-cache");
+    header("Expires: 0");
 
-// Check if the user is already logged in
-if (isset($_SESSION['user_user_id']) && isset($_SESSION['user_name'])) {
-    header('Location: /students/dashboard');
-    exit();
-}
+    // Check if the user is already logged in
+    if (isset($_SESSION['user_user_id']) && isset($_SESSION['user_name'])) {
+        header('Location: /students/dashboard');
+        exit();
+    }
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +61,7 @@ if (isset($_SESSION['user_user_id']) && isset($_SESSION['user_name'])) {
                             <input type="password" class="!px-4 !py-3 border-1 border-zinc-400 rounded-[7px]" name="confirm_password" placeholder="Confirm your Password" required>
                             <button type="submit" class="bg-primary rounded-[7px] !px-10 !py-4 text-center text-light font-500 w-full">Sign Up</button>
                         </form>
-                        <p class="text-center neural-grotesk">Already have an account? <a href="sign-in.php" class="text-accent font-500">Sign In</a></p>
+                        <p class="text-center neural-grotesk">Already have an account? <a href="<?= $base_url ?>/sign-in" class="text-accent font-500">Sign In</a></p>
                     </div>
                 </div>
             </div>

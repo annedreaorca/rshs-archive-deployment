@@ -1,9 +1,15 @@
 <?php
 	session_start();
     include '../db-conn.php';
-
+	
+    // Set base URL for redirections
+    $base_url = "";
+    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+        $base_url = "/rshs-archive";
+    }
+	
 	if (!isset($_SESSION['user_user_id']) && !isset($_SESSION['user_name'])) {
-		header('location: /students/sign-in');
+		header('location: ' . $base_url . '/students/sign-in');
 		exit();
 	}
 	// Function to set active class on navigation for page title

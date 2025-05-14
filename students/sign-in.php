@@ -9,10 +9,17 @@
     header("Cache-Control: no-cache, no-store, must-revalidate");
     header("Pragma: no-cache");
     header("Expires: 0");
+    
+
+    // Set base URL for redirections
+    $base_url = "";
+    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+        $base_url = "/rshs-archive";
+    }
 
     // Check if the user is already logged in
     if (isset($_SESSION['user_user_id']) && isset($_SESSION['user_name'])) {
-        header('Location: /students/dashboard');
+        header('Location: ' . $base_url . '/students/dashboard');
         exit();
     }
 	// Function to set active class on navigation for page title
@@ -56,7 +63,7 @@
                                     <button type="submit" class="bg-primary rounded-[7px] !px-10 !py-4 text-center text-light font-500 w-full">Sign In</button>
                                 </div>
                             </form>
-                            <p class="text-center neural-grotesk">Don't have an account yet? <a href="sign-up" class="text-accent font-500">Sign Up</a></p>
+                            <p class="text-center neural-grotesk">Don't have an account yet? <a href="<?= $base_url ?>/students/sign-up" class="text-accent font-500">Sign Up</a></p>
                         </div>
                     </div>
                 </div>

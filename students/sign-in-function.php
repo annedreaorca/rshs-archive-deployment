@@ -3,16 +3,23 @@ session_start();
 unset($_SESSION['student_id']);
 include '../db-conn.php';
 
+// Set base URL for redirections
+$base_url = "";
+if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+    $base_url = "/rshs-archive";
+}
+
 if (isset($_POST['uid']) && isset($_POST['password'])) {
     
     $uid = $_POST['uid'];
     $password = $_POST['password'];
-
+    
+    // Set base URL for redirections
     if (empty($uid)) {
-        header('location: index.php?error=Username is Required!');
+        header("location: /rshs-archive/students/sign-in?error=Username is Required!");
         exit();
     } elseif (empty($password)) {
-        header('location: index.php?error=Password is Required!');
+        header("location: /rshs-archive/students/sign-in?error=Password is Required!");
         exit();
     } else {
         $stmt = $conn->prepare("SELECT * FROM users WHERE lrn_or_email=?");
@@ -36,18 +43,18 @@ if (isset($_POST['uid']) && isset($_POST['password'])) {
 
                 // Allow both admins (1) and students (2) to access the student dashboard
                 if ($access_level == 2 || $access_level == 1) {
-                    header("Location: /students/dashboard");
+                    header("Location: " . $base_url . "/students/dashboard");
                     exit();
                 } else {
-                    header('location: index.php?error=Access Denied! Only Students of RS can access the dashboard.');
+                    header('location: ' . $base_url . '/students/sign-in?error=Access Denied! Only Students of RS can access the dashboard.');
                     exit();
                 }
             } else {
-                header('location: index.php?error=Wrong Credentials!');
+                header('location: ' . $base_url . '/students/sign-in?error=Wrong Credentials!');
                 exit();
             }
         } else {
-            header('location: index.php?error=Invalid User!');
+            header('location: ' . $base_url . 'students/sign-in?error=Invalid User!');
             exit();
         }
     }
