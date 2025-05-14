@@ -99,6 +99,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'NeurialGrotesk', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -121,13 +122,13 @@ p {
 }
 
 button, a {
-    font-family: 'NeurialGrotesk', sans-serif;
+    font-family: 'NeurialGrotesk', sans-serif !important;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
 .neural-grotesk {
-    font-family: 'NeurialGrotesk', sans-serif;
+    font-family: 'NeurialGrotesk', sans-serif !important;
 }
 
 .helvetica {

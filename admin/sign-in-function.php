@@ -3,6 +3,13 @@ session_start();
 unset($_SESSION['admin_id']);
 include '../db-conn.php';
 
+// Set base URL for redirections
+$base_url = "";
+if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+    $base_url = "/rshs-archive";
+}
+
+
 if (isset($_POST['uid']) && isset($_POST['password'])) {
     
     $uid = $_POST['uid'];

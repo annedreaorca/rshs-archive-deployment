@@ -30,18 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("UPDATE users SET user_name=?, user_gender=?, grade_level=?, profile_image=? WHERE user_id=?");
     $stmt->execute([$user_name, $user_gender, $grade_level, $target_file, $userId]);
 
-    // Set a flag to show the success message
-    $profileUpdated = true;
-    
-    // Refresh user data
-    $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Redirect to the same page with a success parameter
+    header("Location: profile.php?success=true");
+    exit;
 }
 ?>
 
 <section class="flex">
-    <main class="flex-1 min-h-screen p-8 ml-[272px] max-[1023px]:ml-[0px] overflow-scroll-y">
+    <main class="flex-1 min-h-screen p-8 ml-[272px] max-[1023px]:ml-[0px] overflow-scroll-y relative">
         <button onclick="toggleSidebar()" class="lg:hidden text-primary rounded">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
@@ -57,56 +53,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="text-gray-600">Manage your profile information</p>
         </div>
 
-        <?php if (isset($profileUpdated) && $profileUpdated): ?>
-            <div id="success-message" class="p-4 mb-4 text-green-700 bg-green-100 rounded">Profile updated successfully!</div>
+        <?php if (isset($_GET['success'])): ?>
+            <div id="success-message" class="absolute p-4 mb-4 rounded z-999999999 w-full top-0 left-0">
+                <div class="p-4 mb-4 text-[#16904D] bg-[#D0E9DB]">Profile updated successfully!</div>
+            </div>
             <script>
-                // Auto-hide the success message after 3 seconds
                 setTimeout(function() {
                     document.getElementById('success-message').style.display = 'none';
                 }, 3000);
             </script>
         <?php endif; ?>
 
-        <form method="POST" enctype="multipart/form-data" class="space-y-6 max-w-xl">
-            <div>
-                <label class="block font-medium">Profile Image</label>
-                <div class="flex items-center gap-4 mt-2">
-                    <img src="<?= $user['profile_image'] ?? 'default-avatar.png' ?>" alt="Profile Image"
-                         class="w-20 h-20 object-cover rounded-full border">
-                    <input type="file" name="profile_image" accept="image/*" class="block w-full">
+        <div class="flex gap-10">
+            <div class="w-[600px] max-[768px]:w-full">
+                <div class="flex flex-col items-center gap-[10px] p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow relative">
+                    <div class="w-full justify-items-center">
+                        <img src="<?= $user['profile_image'] ?? 'default-avatar.png' ?>" alt="Profile Image"
+                             class="w-[200px] h-[200px] object-cover rounded-full border">
+                    </div>
+                    <div class="w-full justify-items-center">
+                        <h2 class="text-[25px] font-semibold mb-2 text-gray-800 text-center"><?= htmlspecialchars($user['user_name']) ?></h2>
+                        <p class="text-[18px] text-gray-700 text-center neutral-grotesk">Student</p>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label class="block font-medium">Full Name</label>
-                <input type="text" name="user_name" value="<?= htmlspecialchars($user['user_name']) ?>"
-                       class="w-full mt-1 px-4 py-2 border rounded-lg" required>
-            </div>
+            <div class="w-full">
+                <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-[10px] p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow relative">
+                    <div class="w-full">
+                        <label class="block font-medium">Profile Image</label>
+                        <div class="flex items-center gap-4 mt-2">
+                            <img src="<?= $user['profile_image'] ?? 'default-avatar.png' ?>" alt="Profile Image"
+                                 class="w-20 h-20 object-cover rounded-full border">
+                            <input type="file" name="profile_image" accept="image/*" class="block w-full">
+                        </div>
+                    </div>
 
-            <div>
-                <label class="block font-medium">Gender</label>
-                <select name="user_gender" class="w-full mt-1 px-4 py-2 border rounded-lg">
-                    <option value="Male" <?= $user['user_gender'] === 'Male' ? 'selected' : '' ?>>Male</option>
-                    <option value="Female" <?= $user['user_gender'] === 'Female' ? 'selected' : '' ?>>Female</option>
-                </select>
-            </div>
+                    <div class="w-full">
+                        <label class="block font-medium">Full Name</label>
+                        <input type="text" name="user_name" value="<?= htmlspecialchars($user['user_name']) ?>"
+                               class="w-full mt-1 px-4 py-2 border rounded-lg" required>
+                    </div>
 
-            <div>
-                <label class="block font-medium">Grade Level</label>
-                <input type="text" name="grade_level" value="<?= htmlspecialchars($user['grade_level']) ?>"
-                       class="w-full mt-1 px-4 py-2 border rounded-lg" required>
-            </div>
+                    <div class="w-full">
+                        <label class="block font-medium">Gender</label>
+                        <select name="user_gender" class="w-full mt-1 px-4 py-2 border rounded-lg">
+                            <option value="Male" <?= $user['user_gender'] === 'Male' ? 'selected' : '' ?>>Male</option>
+                            <option value="Female" <?= $user['user_gender'] === 'Female' ? 'selected' : '' ?>>Female</option>
+                        </select>
+                    </div>
 
-            <div>
-                <label class="block font-medium text-gray-500">Access Level</label>
-                <input type="text" value="<?= htmlspecialchars($user['access_level']) ?>" disabled
-                       class="w-full mt-1 px-4 py-2 border rounded-lg bg-gray-100 text-gray-500">
-            </div>
+                    <div class="w-full">
+                        <label class="block font-medium">Grade Level</label>
+                        <input type="text" name="grade_level" value="<?= htmlspecialchars($user['grade_level']) ?>"
+                               class="w-full mt-1 px-4 py-2 border rounded-lg" required>
+                    </div>
 
-            <button type="submit"
-                    class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition">Update Profile</button>
-        </form>
+                    <div class="w-full hidden">
+                        <label class="block font-medium text-gray-500">Access Level</label>
+                        <input type="text" value="<?= htmlspecialchars($user['access_level']) ?>" disabled
+                               class="w-full mt-1 px-4 py-2 border rounded-lg bg-gray-100 text-gray-500">
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit"
+                                class="bg-[#1d2a61] text-white !px-[15px] !py-[8px] rounded-[8px] text-sm">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </main>
 </section>
+
 
 <?php include 'students-layout-footer.php'; ?>

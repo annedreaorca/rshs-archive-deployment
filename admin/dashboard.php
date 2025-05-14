@@ -115,7 +115,7 @@ $borrow_requests = $result->fetchAll(PDO::FETCH_ASSOC);
                 <div class="bg-white shadow-md rounded-lg p-6 overview-table">
                     <div class="flex justify-between items-center overview-table-header mb-4">
                         <h2>Borrowed List</h2>
-                        <a href="/admin/approved" class="button-medium gray">View All</a>
+                        <a href="<?= $base_url ?>/admin/approved" class="button-medium gray">View All</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -152,7 +152,7 @@ $borrow_requests = $result->fetchAll(PDO::FETCH_ASSOC);
                 <div class="bg-white shadow-md rounded-lg p-6 overview-table">
                     <div class="flex justify-between items-center overview-table-header mb-4">
                         <h2>Request List</h2>
-                        <a href="/admin/requests" class="button-medium gray">View All</a>
+                        <a href="<?= $base_url ?>/admin/requests" class="button-medium gray">View All</a>
                     </div>
                     <div class="overflow-x-auto w-full">
                         <table class="w-full">
@@ -172,7 +172,7 @@ $borrow_requests = $result->fetchAll(PDO::FETCH_ASSOC);
                                             <td class="table-data">
                                                 <span class="
                                                     <?php 
-                                                        if ($r['status'] == 'Returned') echo 'flex justify-center bg-[#D0E9DB] w-full text-[#16904D] py-2 px-5 rounded-[5px]'; 
+                                                        if ($r['status'] == 'Approved   ') echo 'flex justify-center bg-[#D0E9DB] w-full text-[#16904D] py-2 px-5 rounded-[5px]'; 
                                                         elseif ($r['status'] == 'Pending') echo 'flex justify-center bg-[#FDEFDA] w-full text-[#B6771E] py-2 px-5 rounded-[5px]';
                                                         else echo 'flex justify-center bg-[#F0D2D2] text-[#B61E1E] py-2 px-5 w-full rounded-[5px]';
                                                     ?>

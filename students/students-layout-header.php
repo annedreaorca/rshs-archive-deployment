@@ -12,6 +12,7 @@
 		header('location: ' . $base_url . '/students/sign-in');
 		exit();
 	}
+	
 	// Function to set active class on navigation for page title
 	function setActiveClass($pageName) {
 		$currentPage = basename($_SERVER['PHP_SELF']);
