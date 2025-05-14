@@ -9,20 +9,48 @@ $itemsPerPage = 10;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $itemsPerPage;
 
-// Count total items
-$sqlCount = "SELECT COUNT(*) AS total FROM lab_equipments";
+// Get the active category filter
+$activeFilter = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Set up WHERE clause based on filters
+$whereClause = "";
+$params = [];
+
+if (!empty($activeFilter)) {
+    $whereClause = "WHERE category = :category";
+    $params[':category'] = $activeFilter;
+}
+
+// Count total items with filter
+$sqlCount = "SELECT COUNT(*) AS total FROM lab_equipments $whereClause";
 $stmtCount = $conn->prepare($sqlCount);
+foreach ($params as $key => $value) {
+    $stmtCount->bindValue($key, $value);
+}
 $stmtCount->execute();
 $totalItems = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'];
 $totalPages = ceil($totalItems / $itemsPerPage);
 
-// Fetch paginated items
-$sql = "SELECT item_id, item_name, item_description, uploader, temp_name, item_status, total_available FROM lab_equipments LIMIT :offset, :itemsPerPage";
+// Fetch paginated items with filter
+$sql = "SELECT item_id, item_name, item_description, uploader, temp_name, total_available, item_status, category 
+        FROM lab_equipments $whereClause 
+        ORDER BY item_name ASC
+        LIMIT :offset, :itemsPerPage";
+
 $stmt = $conn->prepare($sql);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->bindValue(':itemsPerPage', $itemsPerPage, PDO::PARAM_INT);
 $stmt->execute();
 $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch all unique categories
+$sqlCategories = "SELECT DISTINCT category FROM lab_equipments WHERE category IS NOT NULL AND category != '' ORDER BY category";
+$stmtClass = $conn->prepare($sqlCategories);
+$stmtClass->execute();
+$categories = $stmtClass->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <section class="flex">
@@ -40,11 +68,25 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <input type="text" id="searchBox" placeholder="Search items..." class="border px-4 py-2 rounded-lg shadow-md w-50 neural-grotesk text-[14px]">
             </div>
         </div>
-
+        
         <div class="flex gap-5 items-center justify-between">
             <div class="page-heading">
                 <h1>Student's Inventory</h1>
                 <p class="text-gray-600">Manage and search for laboratory equipments.</p>
+            </div>
+        </div>
+        
+        <!-- Category Filters -->
+        <div class="category-filters mt-4 mb-6">
+            <div class="flex flex-wrap gap-2">
+                <a href="?page=1" class="<?= empty($activeFilter) ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' ?> px-3 py-1 rounded-md text-sm">All</a>
+                
+                <?php foreach ($categories as $category): ?>
+                    <a href="?page=1&category=<?= urlencode($category['category']) ?>" 
+                       class="<?= $activeFilter === $category['category'] ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' ?> px-3 py-1 rounded-md text-sm">
+                        <?= htmlspecialchars($category['category']) ?>
+                    </a>
+                <?php endforeach; ?>
             </div>
         </div>
 
@@ -68,6 +110,13 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         
                         <h2 class="text-xl font-semibold mb-2 text-gray-800"><?= htmlspecialchars($lab_equipment['item_name']); ?></h2>
+                        
+                        <?php if (!empty($lab_equipment['category'])): ?>
+                            <div class="mb-2">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"><?= htmlspecialchars($lab_equipment['category']); ?></span>
+                            </div>
+                        <?php endif; ?>
+                        
                         <p class="text-[14px] text-gray-700"><?= htmlspecialchars($lab_equipment['item_description']); ?></p>
                         <div class="h-[50px] spacer"></div>
                     </div>
@@ -77,8 +126,8 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div>
                             <a href="borrow-form.php?id=<?= urlencode($lab_equipment['item_id']); ?>" 
-                                class="button-primary text-[12px] pt-[7px] pb-[9px] px-4"
-                                onclick="return confirm('Are you sure you want to borrow this item?');">
+                               class="button-primary text-[12px] pt-[7px] pb-[9px] px-4"
+                               onclick="return confirm('Are you sure you want to borrow this item?');">
                                 Borrow
                             </a>
                         </div>
@@ -87,22 +136,38 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php endforeach; ?>
         </div>
 
-        <!-- Pagination Controls -->
+        <!-- Pagination Controls with category Preservation -->
         <div class="flex justify-center items-center mt-20 space-x-2">
+            <?php 
+            // Build pagination URL with category filter if active
+            $paginationUrl = '?page=';
+            if (!empty($activeFilter)) {
+                $paginationUrl .= '&category=' . urlencode($activeFilter);
+            }
+            ?>
+            
             <?php if ($page > 1): ?>
-                <a href="?page=<?= $page - 1 ?>" class="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300">Previous</a>
+                <a href="<?= $paginationUrl . ($page - 1) ?>" class="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300">Previous</a>
             <?php endif; ?>
 
             <!-- Pagination with Ellipsis -->
             <?php
             if ($totalPages <= 7) {
                 for ($i = 1; $i <= $totalPages; $i++) {
-                    echo '<a href="?page=' . $i . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
+                    $currentPageUrl = '?page=' . $i;
+                    if (!empty($activeFilter)) {
+                        $currentPageUrl .= '&category=' . urlencode($activeFilter);
+                    }
+                    echo '<a href="' . $currentPageUrl . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
                 }
             } else {
                 // First 3 pages
                 for ($i = 1; $i <= 3; $i++) {
-                    echo '<a href="?page=' . $i . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
+                    $currentPageUrl = '?page=' . $i;
+                    if (!empty($activeFilter)) {
+                        $currentPageUrl .= '&category=' . urlencode($activeFilter);
+                    }
+                    echo '<a href="' . $currentPageUrl . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
                 }
                 
                 // Ellipsis if necessary
@@ -114,7 +179,11 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $start = max(4, $page - 1);
                 $end = min($totalPages - 3, $page + 1);
                 for ($i = $start; $i <= $end; $i++) {
-                    echo '<a href="?page=' . $i . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
+                    $currentPageUrl = '?page=' . $i;
+                    if (!empty($activeFilter)) {
+                        $currentPageUrl .= '&category=' . urlencode($activeFilter);
+                    }
+                    echo '<a href="' . $currentPageUrl . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
                 }
 
                 // Ellipsis before the last 3 pages
@@ -124,13 +193,17 @@ $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Last 3 pages
                 for ($i = $totalPages - 2; $i <= $totalPages; $i++) {
-                    echo '<a href="?page=' . $i . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
+                    $currentPageUrl = '?page=' . $i;
+                    if (!empty($activeFilter)) {
+                        $currentPageUrl .= '&category=' . urlencode($activeFilter);
+                    }
+                    echo '<a href="' . $currentPageUrl . '" class="px-4 py-2 ' . ($i == $page ? 'bg-[#1d2a61] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300') . ' rounded-lg">' . $i . '</a>';
                 }
             }
             ?>
 
             <?php if ($page < $totalPages): ?>
-                <a href="?page=<?= $page + 1 ?>" class="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300">Next</a>
+                <a href="<?= $paginationUrl . ($page + 1) ?>" class="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300">Next</a>
             <?php endif; ?>
         </div>
     </main>
@@ -143,13 +216,31 @@ document.getElementById('searchBox').addEventListener('input', function() {
     let searchQuery = this.value.trim();
     
     if (searchQuery.length > 0) {
-        fetch('search-inventory.php?query=' + encodeURIComponent(searchQuery))
+        // Get current category filter if any
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category') || '';
+        
+        // Include category in search request
+        let searchUrl = 'search-inventory.php?query=' + encodeURIComponent(searchQuery);
+        if (category) {
+            searchUrl += '&category=' + encodeURIComponent(category);
+        }
+        
+        fetch(searchUrl)
             .then(response => response.text())
             .then(data => {
                 document.getElementById('inventoryList').innerHTML = data;
             });
     } else {
-        location.href = '?page=1'; // Reset to first page when search is empty
+        // Maintain category filter when resetting search
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category') || '';
+        
+        if (category) {
+            location.href = '?page=1&category=' + encodeURIComponent(category);
+        } else {
+            location.href = '?page=1';
+        }
     }
 });
 </script>

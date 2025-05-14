@@ -6,13 +6,29 @@ $base_url = "";
 if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
     $base_url = "/rshs-archive";
 }
+
 if (isset($_GET['query'])) {
     $searchQuery = '%' . $_GET['query'] . '%';
-
-    // Search for items that match the query
-    $sql = "SELECT item_id, item_name, item_description, temp_name, item_status, total_available FROM lab_equipments WHERE item_name LIKE ?";
+    $category = isset($_GET['category']) ? $_GET['category'] : '';
+    
+    // Base SQL with search term
+    $sql = "SELECT item_id, item_name, item_description, temp_name, item_status, total_available, category 
+            FROM lab_equipments 
+            WHERE item_name LIKE :search";
+    
+    $params = [':search' => $searchQuery];
+    
+    // Add category filter if provided
+    if (!empty($category)) {
+        $sql .= " AND category = :category";
+        $params[':category'] = $category;
+    }
+    
     $stmt = $conn->prepare($sql);
-    $stmt->execute([$searchQuery]);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($results) > 0) {
@@ -35,6 +51,14 @@ if (isset($_GET['query'])) {
             echo '</div>';
             
             echo '<h2 class="text-xl font-semibold mb-2 text-gray-800">' . htmlspecialchars($lab_equipment['item_name']) . '</h2>';
+            
+            // Display category badge
+            if (!empty($lab_equipment['category'])) {
+                echo '<div class="mb-2">';
+                echo '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">' . htmlspecialchars($lab_equipment['category']) . '</span>';
+                echo '</div>';
+            }
+            
             echo '<p class="text-[14px] text-gray-700">' . htmlspecialchars($lab_equipment['item_description']) . '</p>';
             echo '<div class="h-[50px] spacer"></div>';
             echo '</div>';
