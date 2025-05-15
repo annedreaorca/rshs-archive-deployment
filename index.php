@@ -1,5 +1,12 @@
 <?php
     $pageTitle = 'RSHS Archive';
+    
+    // Set base URL for redirections
+    $base_url = "";
+    if(strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+        $base_url = "/rshs-archive";
+    }
+
 	// Function to set active class on navigation for page title
 	function setActiveClass($pageName) {
 		$currentPage = basename($_SERVER['PHP_SELF']);
@@ -40,7 +47,7 @@
             </div>
             <!-- Login Button (Visible on Desktop) -->
             <div class="max-[1024px]:hidden lg:block header-button">
-                <a href="portal.php" class="bg-primary rounded-full !px-7 !py-2.5 text-center text-light font-500">Login</a>
+                <a href="<?= $base_url ?>/portal" class="bg-primary rounded-full !px-7 !py-3 text-center text-light font-500">Login</a>
             </div>
 
             <!-- Hamburger Menu (Visible on Mobile) -->
@@ -66,7 +73,7 @@
                     <li class="nav-link"><a href="#our-team" class="block p-4">Our Team</a></li>
                 </ul>
                 <div class="flex header-button !w-full">
-                    <a href="portal.php" class="bg-primary rounded-full !px-7 !py-3 text-center text-light font-500 w-full">Login</a>
+                    <a href="<?= $base_url ?>/portal" class="bg-primary rounded-full !px-7 !py-3 text-center text-light font-500 w-full">Login</a>
                 </div>
             </div>
         </header>

@@ -12,8 +12,10 @@
 ?>
 <!-- Sidebar -->
 <aside id="sidebar" class="!fixed top-0 left-0 h-screen w-68 !bg-white shadow-lg transform -translate-x-full transition-transform duration-300 lg:translate-x-0 lg:relative p-6 !z-[99999]">
-    <div class="flex items-center justify-between pb-4">
-        <img src="<?= $base_url ?>/assets/images/Archive-Logo.png" alt="RSHS Archive Logo" class="w-[140px] mb-[-10px]">
+    <div class="flex items-center justify-between mb-4">
+        <a href="<?= $base_url ?>/students/dashboard" class="flex items-center">
+            <img src="<?= $base_url ?>/assets/images/Archive-Logo.png" alt="Logo" class="w-30">
+        </a>
         <button onclick="toggleSidebar()" class="lg:hidden">
         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
         </button>
