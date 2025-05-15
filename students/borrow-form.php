@@ -38,6 +38,9 @@
     if (!$user) {
         die("<p class='text-red-500'>Error: User data not found.</p>");
     }
+    
+    // Check that lrn_or_email exists and has a value
+    $user_email = isset($user['lrn_or_email']) ? $user['lrn_or_email'] : '';
 
     date_default_timezone_set('Asia/Manila');
     $cdate = date("F j, Y h:i:sa");
@@ -63,8 +66,8 @@
             <label for="quantity" class="block text-gray-700 font-medium">Quantity</label>
             <input type="number" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" name="quantity" id="quantity" min="1" max="<?= htmlspecialchars($row['total_available']) ?>" required>
 
-
-            <input type="hidden" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" name="lrn_or_email" id="lrn_or_email" value="<?= htmlspecialchars($user['lrn_or_email']) ?>" readonly required>
+            <!-- Modified line to handle potentially missing lrn_or_email -->
+            <input type="hidden" name="lrn_or_email" id="lrn_or_email" value="<?= htmlspecialchars($user_email) ?>">
 
             <label for="cdate" class="block text-gray-700 font-medium">Date</label>
             <input type="text" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" name="cdate" id="cdate" value="<?= $cdate ?>" readonly required>

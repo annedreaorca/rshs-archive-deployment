@@ -1,4 +1,4 @@
-    <?php
+<?php
     $pageTitle = 'Profile';
     include 'admin-layout-header.php';
     include '_components/loading.php';
@@ -37,7 +37,7 @@
         $stmt->execute([$userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    ?>
+?>
 
     <section class="flex">
         <main class="flex-1 min-h-screen p-8 ml-[272px] max-[1023px]:ml-[0px] overflow-scroll-y relative">

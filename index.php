@@ -291,7 +291,7 @@
                         <div class="flex flex-col gap-2 px-5 w-full">
                             <h3 class="title text-center">Mahasiah A. Bautista</h3>
                             <span class="title text-center text-primary role">Developer</span>
-                            <a href="mailto:" class="email text-center">202110045@gordoncollege.edu.ph</a>
+                            <a href="mailto:202110045@gordoncollege.edu.ph" class="email text-center">202110045@gordoncollege.edu.ph</a>
                         </div>
                     </div>
                     <div class="flex flex-col gap-5 team-card">
@@ -301,7 +301,7 @@
                         <div class="flex flex-col gap-2 px-5 w-full">
                             <h3 class="title text-center">Christian Jay A. Cuya</h3>
                             <span class="title text-center text-primary role">Developer</span>
-                            <a href="mailto:202110045@gordoncollege.edu.ph" class="email text-center">202110045@gordoncollege.edu.ph</a>
+                            <a href="mailto:202110064@gordoncollege.edu.ph" class="email text-center">202110064@gordoncollege.edu.ph</a>
                         </div>
                     </div>
                     <div class="flex flex-col gap-5 team-card">
@@ -327,11 +327,11 @@
                     </div>
                     <!-- Desktop Navigation -->
                     <ul class="flex gap-8 justify-center items-center footer-nav">
-                    <li class="nav-link"><a href="#">Home</a></li>
-                    <li class="nav-link"><a href="#features">Features</a></li>
-                    <li class="nav-link"><a href="#how-to-use">How To Use</a></li>
-                    <li class="nav-link"><a href="#collaboration">Collaboration</a></li>
-                    <li class="nav-link"><a href="#our-team">Our Team</a></li>
+                        <li class="nav-link"><a href="#">Home</a></li>
+                        <li class="nav-link"><a href="#features">Features</a></li>
+                        <li class="nav-link"><a href="#how-to-use">How To Use</a></li>
+                        <li class="nav-link"><a href="#collaboration">Collaboration</a></li>
+                        <li class="nav-link"><a href="#our-team">Our Team</a></li>
                     </ul>
                     <hr class="w-full border-t border-t-1 border-gray-400 !mt-5 !pb-5">
                     <div class="flex justify-center items-center w-full footer-bottom">

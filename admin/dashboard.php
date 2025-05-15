@@ -172,7 +172,7 @@ $borrow_requests = $result->fetchAll(PDO::FETCH_ASSOC);
                                             <td class="table-data">
                                                 <span class="
                                                     <?php 
-                                                        if ($r['status'] == 'Approved   ') echo 'flex justify-center bg-[#D0E9DB] w-full text-[#16904D] py-2 px-5 rounded-[5px]'; 
+                                                        if ($r['status'] == 'Approved') echo 'flex justify-center bg-[#D0E9DB] w-full text-[#16904D] py-2 px-5 rounded-[5px]'; 
                                                         elseif ($r['status'] == 'Pending') echo 'flex justify-center bg-[#FDEFDA] w-full text-[#B6771E] py-2 px-5 rounded-[5px]';
                                                         else echo 'flex justify-center bg-[#F0D2D2] text-[#B61E1E] py-2 px-5 w-full rounded-[5px]';
                                                     ?>

@@ -30,9 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("UPDATE users SET user_name=?, user_gender=?, grade_level=?, profile_image=? WHERE user_id=?");
     $stmt->execute([$user_name, $user_gender, $grade_level, $target_file, $userId]);
 
-    // Redirect to the same page with a success parameter
-    header("Location: profile.php?success=true");
-    exit;
+    // Set a flag to show the success message
+    $profileUpdated = true;
+    
+    // Refresh user data
+    $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -53,11 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="text-gray-600">Manage your profile information</p>
         </div>
 
-        <?php if (isset($_GET['success'])): ?>
+       
+        <?php if (isset($profileUpdated) && $profileUpdated): ?>
             <div id="success-message" class="absolute p-4 mb-4 rounded z-999999999 w-full top-0 left-0">
                 <div class="p-4 mb-4 text-[#16904D] bg-[#D0E9DB]">Profile updated successfully!</div>
             </div>
             <script>
+                // Auto-hide the success message after 3 seconds
                 setTimeout(function() {
                     document.getElementById('success-message').style.display = 'none';
                 }, 3000);
@@ -68,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="w-[600px] max-[768px]:w-full">
                 <div class="flex flex-col items-center gap-[10px] p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow relative">
                     <div class="w-full justify-items-center">
-                        <img src="<?= $user['profile_image'] ?? 'default-avatar.png' ?>" alt="Profile Image"
+                        <img src="<?= $user['profile_image'] ?? '../assets/images/default-avatar.png' ?>" alt="Profile Image"
                              class="w-[200px] h-[200px] object-cover rounded-full border">
                     </div>
                     <div class="w-full justify-items-center">
@@ -83,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="w-full">
                         <label class="block font-medium">Profile Image</label>
                         <div class="flex items-center gap-4 mt-2">
-                            <img src="<?= $user['profile_image'] ?? 'default-avatar.png' ?>" alt="Profile Image"
+                            <img src="<?= $user['profile_image'] ?? '../assets/images/default-avatar.png' ?>" alt="Profile Image"
                                  class="w-20 h-20 object-cover rounded-full border">
                             <input type="file" name="profile_image" accept="image/*" class="block w-full">
                         </div>
