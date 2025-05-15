@@ -66,7 +66,7 @@ $categories = $stmtClass->fetchAll(PDO::FETCH_ASSOC);
             </button>
             <div class="flex gap-4 justify-between w-full max-[1024px]:w-auto">
                 <input type="text" id="searchBox" placeholder="Search items..." class="border px-4 py-2 rounded-lg shadow-md w-50 neural-grotesk text-[14px]">
-                <a href="/admin/add-item" class="button-add">
+                <a href="<?= $base_url ?>/admin/add-item" class="button-add">
                     <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                         <path d="M12 5l0 14" /><path d="M5 12l14 0" />
