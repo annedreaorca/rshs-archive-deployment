@@ -56,7 +56,7 @@
                                         <input type="text" class="!px-4 !py-3 border-1 border-zinc-400 rounded-[7px]" name="uid" id="uid" placeholder="Enter your Email">
                                         <input type="password" class="!px-4 !py-3 border-1 border-zinc-400 rounded-[7px]" name="password" id="pass" placeholder="Enter your Password">
                                     </div>
-                                    <a href="#" class="text-accent text-right text-sm font-500">Forgot Password?</a>
+                                    <a href="<?= $base_url ?>/students/forgot-password.php" class="text-accent text-right text-sm font-500">Forgot Password?</a>
                                 </div>
                                 
                                 <div class="flex gap-4">
