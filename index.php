@@ -284,46 +284,6 @@
                 </div>
             </div>
         </section>
-        <section class="flex about-us-wrapper !py-[100px] max-[1024px]:!py-25 !px-15 max-[1024px]:!px-5 default-container rounded-[40px] max-[1024px]:!rounded-[20px]" id="our-team">
-            <div class="flex flex-col gap-15 team-content">
-                <div class="flex flex-col gap-5">
-                    <h2 class="section-title text-center">Our Team</h2>
-                    <p class="section-desc text-center">A Passionate Team Dedicated to Revolutionizing Laboratory Management, Ensuring Seamless Access to Resources, and Enhancing Efficiency for Students and Educators Alike..</p>
-                </div>
-                <div class="grid grid-cols-3 max-[768px]:!grid-cols-2 max-[458px]:!grid-cols-1 gap-10 feature-cards">
-                    <div class="flex flex-col gap-5 team-card">
-                        <div class="team-image">
-                            <img src="assets/images/Mahasiah Bautista.jpg" alt="Equipment Inventory">
-                        </div>
-                        <div class="flex flex-col gap-2 px-5 w-full">
-                            <h3 class="title text-center">Mahasiah A. Bautista</h3>
-                            <span class="title text-center text-primary role">Developer</span>
-                            <a href="mailto:202110045@gordoncollege.edu.ph" class="email text-center">202110045@gordoncollege.edu.ph</a>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-5 team-card">
-                        <div class="team-image">
-                            <img src="assets/images/Christian Jay Cuya.jpg" alt="Equipment Inventory">
-                        </div>
-                        <div class="flex flex-col gap-2 px-5 w-full">
-                            <h3 class="title text-center">Christian Jay A. Cuya</h3>
-                            <span class="title text-center text-primary role">Developer</span>
-                            <a href="mailto:202110064@gordoncollege.edu.ph" class="email text-center">202110064@gordoncollege.edu.ph</a>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-5 team-card">
-                        <div class="team-image">
-                            <img src="assets/images/Andrea Anne Orca.jpg" alt="Equipment Inventory">
-                        </div>
-                        <div class="flex flex-col gap-2 px-5 w-full">
-                            <h3 class="title text-center">Andrea Anne P. Orca</h3>
-                            <span class="title text-center text-primary role">Developer</span>
-                            <a href="mailto:202110209@gordoncollege.edu.ph" class="email text-center">202110209@gordoncollege.edu.ph</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
         <footer class="footer-wrapper">
             <div class="flex justify-between items-center !py-20 !px-15 max-[1024px]:!px-5  default-container bg-transparent relative">
                 <div class="flex flex-col gap-10 items-center w-full footer-content">
